@@ -133,6 +133,10 @@ android {
         jvmTarget = "1.8"
     }
 
+    viewBinding{
+        enabled = true
+    }
+
     defaultConfig {
         applicationId "com.booksearch"
         minSdkVersion rootProject.ext.minSdkVersion

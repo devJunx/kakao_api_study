@@ -7,7 +7,6 @@ import com.facebook.react.ReactNativeHost
 import com.facebook.react.ReactPackage
 import com.facebook.react.PackageList
 import com.facebook.soloader.SoLoader
-import com.booksearch.MainApplication
 import com.facebook.react.ReactInstanceManager
 import java.lang.reflect.InvocationTargetException
 
@@ -38,6 +37,7 @@ class MainApplication : Application(), ReactApplication {
         super.onCreate()
         SoLoader.init(this,  /* native exopackage */false)
         initializeFlipper(this, reactNativeHost.reactInstanceManager)
+
     }
 
     companion object {

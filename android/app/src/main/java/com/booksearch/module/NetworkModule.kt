@@ -1,6 +1,7 @@
 package com.booksearch.module
 
 import android.util.Log
+import android.widget.Toast
 import com.alibaba.fastjson.JSON
 import com.facebook.react.bridge.*
 import okhttp3.*
@@ -32,7 +33,7 @@ class NetworkModule(reactContext: ReactApplicationContext) :
         try {
             if (query != "") {
                 /* Example(url: https://dapi.kakao.com, root: /v3/search/book?, query: 아기공룔둘리)*/
-                val requestUrl = url + root + "query=" + query + "&size=1&page=10&target=title"
+                val requestUrl = url + root + "query=" + query + "&size=10&page=10&target=title"
                 val requestBuilder = Request.Builder().url(requestUrl).get()
                 requestBuilder.addHeader(
                     "Authorization",
@@ -71,10 +72,9 @@ class NetworkModule(reactContext: ReactApplicationContext) :
                     } else if (contentType.indexOf("json") > -1) {
                         try {
                             val isJsonObj = JSON.parse(responseText) is JSONObject
-                            Log.e("tt", JSON.parse(responseText).javaClass.name)
-                            println("test")
-                            Log.e("gg", isJsonObj.toString() + " ")
-                            promise.resolve(convertJsonToMap(JSONObject(responseText)))
+                            if(!isJsonObj){
+                                promise.resolve(convertJsonToMap(JSONObject(responseText)))
+                            }
                         } catch (e: Exception) {
                             e.printStackTrace()
                             promise.reject("test", Throwable(e))
@@ -86,6 +86,7 @@ class NetworkModule(reactContext: ReactApplicationContext) :
 
         } catch (e: Exception) {
 //            println("test: " + url + root + "query=" + query + "&size=1&page=1&target=title")
+//            Toast.makeText(this, "테스트", Toast.LENGTH_LONG)
             e.printStackTrace()
             promise.reject(e)
         }

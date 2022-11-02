@@ -1,6 +1,7 @@
 import React from 'react';
-import { Button, FlatList, StyleSheet, Text, TextInput, View, ToastAndroid, TouchableWithoutFeedback, Linking } from 'react-native';
+import { Button, FlatList, StyleSheet, Text, TextInput, View, ToastAndroid, TouchableWithoutFeedback } from 'react-native';
 import NetworkModule from './module/NetworkModule';
+import WebviewModule from './module/WebviewModule';
 
 const DATA = [{ id: '0', title: '책 이름', authors: '저자', url: 'https://namu.wiki/w/%EC%B1%85' }]
 interface IKakaoNetwork {
@@ -9,6 +10,12 @@ interface IKakaoNetwork {
         root: string,
         query: string,
         encode?: boolean
+    )
+}
+interface WebView{
+    view<T = string>(
+        url: string,
+    isWebView: boolean
     )
 }
 var connectionCount = 0
@@ -36,20 +43,36 @@ export const KakaoNetwork: IKakaoNetwork = {
             NetworkModule.onRequest<T>(url, root, query)
                 .then(resolve)
                 .catch(error => {
-                    !isNotShowingIndicator && reject(error)
-                })
-                .finally(() => {
-                    if (!isNotShowingIndicator) {
-                        --connectionCount
-
-                        setTimeout(() => {
-                            connectionCount < 1 && LoadingIndicatorManager.close()
-                        }, 100)
-                    }
+                    console.log(error)
+                    reject(error)
                 })
         })
 
     },
+}
+
+
+const OnWebView: WebView = {
+    view<T=string>(url: string, isWebView: boolean): Promise<T>{
+    return new Promise((resolve, reject) => {
+            if(isWebView){
+                console.log('test')
+                WebviewModule.onCreateWebVew<T>(url, true)
+                .then(resolve)
+                .catch(error => {
+                    reject(error)
+                })
+            }
+        })
+    }
+}
+const onCreateWeb = (viewUrl: string) => {
+    console.log('test')
+    return OnWebView.view(viewUrl, true)
+        .then((res: any) => {
+            console.log(res)
+        })
+        .catch((error: string) => console.log(error))
 }
 
 const bookSearch = async (query: any) => {
@@ -58,18 +81,20 @@ const bookSearch = async (query: any) => {
     // console.log('test: ', encodeURI(url))
     return KakaoNetwork.get('https://dapi.kakao.com', '/v3/search/book?', encodeURI(query))
         .then((res: any) => {
-            console.log(res)
-            // console.log('test:', res)
-            // console.log(typeof res)
-            DATA[DATA.length] = {
-                id: DATA.length.toString(),
-                title: res.documents[0].title,
-                authors: res.documents[0].authors,
-                url: res.documents[0].url
+            if(res.meta.pageable_count != 0){
+                for(let i = 0; i<res.documents.length; i++){
+                    DATA[DATA.length] = {
+                        id: DATA.length.toString(),
+                        title: res.documents[i].title,
+                        authors: res.documents[i].authors,
+                        url: res.documents[i].url
+                    }
+                }
+            } else{
+                ToastAndroid.showWithGravity("검색하신 키워드의 책이 안 보입니다.", ToastAndroid.SHORT, ToastAndroid.CENTER)
             }
-            // console.log(DATA[1].url)
         })
-        .catch((error: string) => console.log('error:', error))
+        .catch((error: string) => console.log(error))
 };
 
 const styles = StyleSheet.create({
@@ -95,10 +120,12 @@ const styles = StyleSheet.create({
     }
 })
 
+
+
 const Item = ({ id, title, author }) => {
     const titleSize = (title + author).length < 15 ? styles.title : { fontSize: 15 }
     return (
-        <TouchableWithoutFeedback onPress={() => Linking.openURL(DATA[id].url)}>
+        <TouchableWithoutFeedback onPress={() => onCreateWeb(DATA[id].url)}>
             <View style={styles.item}>
                 <Text style={titleSize}>{title}</Text>
                 <Text style={titleSize}>({author})</Text>
@@ -119,8 +146,7 @@ const DataList = () => {
             <Text style={{ textAlign: 'center', fontSize: 15, marginTop: 10 }}>작가가 2명 이상시 1명만 표시</Text>
             <FlatList
                 data={DATA}
-                renderItem={renderItem}
-                keyExtractor={item => item.id} />
+                renderItem={renderItem} />
         </View>
     )
 }

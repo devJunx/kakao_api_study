@@ -6,6 +6,7 @@ import com.facebook.react.bridge.NativeModule
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.uimanager.ViewManager
 import com.booksearch.module.NetworkModule
+import com.booksearch.module.WebviewModule
 import java.util.*
 
 class PluginsPackage : ReactPackage {
@@ -13,6 +14,7 @@ class PluginsPackage : ReactPackage {
         val modules: MutableList<NativeModule> = ArrayList()
         modules.run{
             add(NetworkModule(reactContext))
+            add(WebviewModule(reactContext))
         }
         return modules
     }
