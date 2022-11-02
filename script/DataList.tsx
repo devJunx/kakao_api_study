@@ -57,7 +57,7 @@ const OnWebView: WebView = {
     return new Promise((resolve, reject) => {
             if(isWebView){
                 console.log('test')
-                WebviewModule.onCreateWebVew<T>(url, true)
+                WebviewModule.onCreateWebView<T>(url, true)
                 .then(resolve)
                 .catch(error => {
                     reject(error)

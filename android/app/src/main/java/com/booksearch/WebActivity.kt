@@ -1,12 +1,11 @@
 package com.booksearch
 
+import android.content.Intent
 import android.net.Uri
 import android.webkit.WebViewClient
 import android.os.Bundle
-import android.util.Log
 import com.booksearch.databinding.ActivityWebBinding
 import com.facebook.react.ReactActivity
-import com.facebook.react.bridge.ReactMethod
 
 class WebActivity : ReactActivity() {
 
@@ -21,11 +20,21 @@ class WebActivity : ReactActivity() {
 
         webView.webViewClient = WebViewClient()
 
-        val intent = getIntent()
+        val getIntent = getIntent()
 
-        val url = intent.getStringExtra("url")
-        Uri.parse(url)
-//        webView.loadUrl(url)
+        val url = getIntent.getStringExtra("url")
+
+        val intent = Intent(this@WebActivity, MainActivity::class.java)
+
+        wbBinding.closeButton.setOnClickListener {
+            startActivity(intent)
+        }
+//        val uri = Uri.parse(url)
+//
+//        val test = Intent(Intent.ACTION_VIEW, uri)
+//        startActivity(test)
+            webView.settings.javaScriptEnabled = true
+            webView.loadUrl(url)
     }
 
     override fun onBackPressed() {

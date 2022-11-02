@@ -16,7 +16,7 @@ class WebviewModule(reactContext: ReactApplicationContext) : ReactContextBaseJav
     private lateinit var wbBinding: ActivityWebBinding
 
     override fun getName(): String {
-        return "WebviewModule"
+        return "webView"
     }
 
     private val reactContext = reactContext
@@ -30,7 +30,6 @@ class WebviewModule(reactContext: ReactApplicationContext) : ReactContextBaseJav
                 promise.resolve("view Test")
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 intent.putExtra("url", url)
-//                intent.putExtra("test", reactContext.toString())
                 this.reactContext.startActivity(intent)
             }
         } catch (e: Exception){
