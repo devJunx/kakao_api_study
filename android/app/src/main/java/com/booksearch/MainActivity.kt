@@ -1,9 +1,6 @@
 package com.booksearch
 
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import com.booksearch.module.WebviewModule
 import com.facebook.react.ReactActivity
 
 

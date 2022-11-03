@@ -133,8 +133,8 @@ android {
         jvmTarget = "1.8"
     }
 
-    viewBinding{
-        enabled = true
+    buildFeatures{
+        viewBinding true
     }
 
     defaultConfig {
@@ -197,7 +197,7 @@ dependencies {
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules
 
-    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+//     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.5.31"
     implementation 'com.squareup.okhttp3:okhttp:4.9.0'
     implementation 'org.json:json:20200518'

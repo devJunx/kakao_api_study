@@ -9,20 +9,45 @@
     tools:context=".WebActivity">
 
     <LinearLayout
-        android:id="@+id/view_header"
+        android:id="@+id/header_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <TextView
+        <EditText
+            android:id="@+id/url_input"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginVertical="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="5"
+            android:background="@drawable/not_border"
+            android:ems="10"
+            android:hint="@string/url"
+            android:inputType="textUri"
+            android:padding="5dp"
+            android:textSize="20sp"
+            android:selectAllOnFocus="true"
+            android:imeOptions="actionDone"
+            tools:ignore="TouchTargetSizeCheck"/>
+
+        <ImageView
+            android:id="@+id/search_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="end"
+            android:contentDescription="@string/close_button_description"
+            android:padding="5dp"
+            android:src="@drawable/ic_baseline_search_24"
+            tools:ignore="ImageContrastCheck" />
+
+        <ImageView
             android:id="@+id/copy_this_url"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:paddingLeft="10dp"
-            android:text="@string/url_copy"
-            android:textSize="25sp" />
+            android:padding="10dp"
+            app:srcCompat="@drawable/ic_baseline_content_copy_24" />
 
         <ImageView
             android:id="@+id/close_button"
@@ -30,6 +55,7 @@
             android:layout_height="50dp"
             android:layout_gravity="end"
             android:contentDescription="@string/close_button_description"
+            android:padding="5dp"
             android:src="@drawable/ic_baseline_close_24"
             tools:ignore="ImageContrastCheck" />
     </LinearLayout>
