@@ -27,7 +27,6 @@ class WebviewModule(reactContext: ReactApplicationContext) : ReactContextBaseJav
         try{
             val intent = Intent(reactApplicationContext, WebActivity::class.java)
             if(isWebView){
-                promise.resolve("view Test")
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 intent.putExtra("url", url)
                 this.reactContext.startActivity(intent)

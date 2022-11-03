@@ -3,7 +3,8 @@ import { Button, FlatList, StyleSheet, Text, TextInput, View, ToastAndroid, Touc
 import NetworkModule from './module/NetworkModule';
 import WebviewModule from './module/WebviewModule';
 
-const DATA = [{ id: '0', title: '책 이름', authors: '저자', url: 'https://namu.wiki/w/%EC%B1%85' }]
+const DATA = [{ id: '0', title: '예시책', authors: '예시저자', url: 'https://namu.wiki/w/%EC%B1%85' }]
+
 interface IKakaoNetwork {
     get<T = string>(
         url: string,
@@ -56,7 +57,6 @@ const OnWebView: WebView = {
     view<T=string>(url: string, isWebView: boolean): Promise<T>{
     return new Promise((resolve, reject) => {
             if(isWebView){
-                console.log('test')
                 WebviewModule.onCreateWebView<T>(url, true)
                 .then(resolve)
                 .catch(error => {
@@ -67,7 +67,6 @@ const OnWebView: WebView = {
     }
 }
 const onCreateWeb = (viewUrl: string) => {
-    console.log('test')
     return OnWebView.view(viewUrl, true)
         .then((res: any) => {
             console.log(res)
@@ -86,7 +85,7 @@ const bookSearch = async (query: any) => {
                     DATA[DATA.length] = {
                         id: DATA.length.toString(),
                         title: res.documents[i].title,
-                        authors: res.documents[i].authors,
+                        authors: res.documents[i].authors.length > 1 ? res.documents[i].authors[0] : res.documents[i].authors,
                         url: res.documents[i].url
                     }
                 }
@@ -99,17 +98,16 @@ const bookSearch = async (query: any) => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: 'lightblue',
+        backgroundColor: '#f7dfb0',
         width: '100%',
         height: '100%'
     },
     item: {
-        backgroundColor: 'skyblue',
+        backgroundColor: '#FCB837',
         paddingVertical: 15,
         paddingHorizontal: 10,
         marginVertical: 8,
         marginHorizontal: 16,
-        flexDirection: 'row'
     },
     title: {
         fontSize: 18,
@@ -127,22 +125,22 @@ const Item = ({ id, title, author }) => {
     return (
         <TouchableWithoutFeedback onPress={() => onCreateWeb(DATA[id].url)}>
             <View style={styles.item}>
-                <Text style={titleSize}>{title}</Text>
-                <Text style={titleSize}>({author})</Text>
+                <Text style={titleSize}>책이름: {title}</Text>
+                <Text style={titleSize}>저자: {author}</Text>
             </View>
         </TouchableWithoutFeedback>
     )
 };
 const DataList = () => {
     const renderItem = ({ item }) => (
-        <Item id={item.id} title={item.title} author={item.authors.length > 1 && typeof item.authors == "object" ? item.authors[0] : item.authors}/>
+        <Item id={item.id} title={item.title} author={item.authors.length > 0 ? item.authors : "작가를 모르겠습니다."}/>
     );
     const [input, setInput] = React.useState('')
-
     return (
         <View style={styles.container}>
             <TextInput style={styles.input} onChangeText={(text: any) => setInput(text)} />
-            <Button title='책 검색' onPress={() => { bookSearch(input) }} />
+            <Text style={{backgroundColor: '#e89e0e', color: 'white', textAlign: 'center', paddingVertical: 15, borderRadius: 5, marginHorizontal: 5}} onPress={() => { bookSearch(input)}}>책검색</Text>
+            {/* <Button title='책 검색' onPress={() => { bookSearch(input) }}/> */}
             <Text style={{ textAlign: 'center', fontSize: 15, marginTop: 10 }}>작가가 2명 이상시 1명만 표시</Text>
             <FlatList
                 data={DATA}
@@ -150,6 +148,4 @@ const DataList = () => {
         </View>
     )
 }
-export default DataList
-
-//
+export default DataList;

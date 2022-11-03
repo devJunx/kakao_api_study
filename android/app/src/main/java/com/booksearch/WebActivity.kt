@@ -1,9 +1,13 @@
 package com.booksearch
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.webkit.WebViewClient
 import android.os.Bundle
+import android.widget.Toast
 import com.booksearch.databinding.ActivityWebBinding
 import com.facebook.react.ReactActivity
 
@@ -29,12 +33,19 @@ class WebActivity : ReactActivity() {
         wbBinding.closeButton.setOnClickListener {
             startActivity(intent)
         }
-//        val uri = Uri.parse(url)
-//
-//        val test = Intent(Intent.ACTION_VIEW, uri)
-//        startActivity(test)
-            webView.settings.javaScriptEnabled = true
-            webView.loadUrl(url)
+        webView.apply {
+            settings.javaScriptEnabled = true
+            settings.setSupportZoom(true)
+            loadUrl(url)
+        }
+
+        wbBinding.copyThisUrl.setOnClickListener {
+            val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip: ClipData = ClipData.newPlainText("url", webView.url)
+            clipboardManager.setPrimaryClip(clip)
+            Toast.makeText(this@WebActivity, "보이시는 화면의 URL이 복사가 되었습니다", Toast.LENGTH_SHORT).show()
+        }
+
     }
 
     override fun onBackPressed() {
