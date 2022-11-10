@@ -1,2 +1,2 @@
 # kakao api book search study
-<img src="./book_app.gig"/>
+<img width="300px" src="./book_app.gig"/>
