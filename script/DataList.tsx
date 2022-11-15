@@ -181,7 +181,7 @@ const bookSearch = async (query: string, isScroll?: boolean) => {
         .catch((error: string) => console.log(error))
 };
 
-const DataList = (ref: any) => {
+const DataList = () => {
     const renderItem = ({ item }) => (
         <Item id={item.id} title={item.title} author={item.authors.length > 0 ? item.authors : "작가를 모르겠습니다."} sale_price={item.sale_price} thumbnail={item.thumbnail} publisher={item.publisher} />
     );
