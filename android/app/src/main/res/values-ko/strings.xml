@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">책검색</string>
+    <string name="close_button_description">책 정보 화면 종료 버튼</string>
+    <string name="url">https://example.com</string>
+</resources>

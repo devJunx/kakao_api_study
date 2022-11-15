@@ -1,5 +1,6 @@
 package com.booksearch.module
 
+import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import com.alibaba.fastjson.JSON
@@ -11,22 +12,12 @@ import java.util.*
 import kotlin.collections.HashMap
 import com.booksearch.network.Network
 
-class NetworkModule(reactContext: ReactApplicationContext) :
+class NetworkModule(private val reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext), Network {
 
     override fun getName(): String {
         return "NetworkModule"
     }
-
-//    private fun Cache.clearMalformedUrls() {
-//        // corrupt 된 캐시 삭제하기
-//        val urlIterator = urls()
-//        while (urlIterator.hasNext()) {
-//            if (urlIterator.next().toHttpUrlOrNull() == null) {
-//                urlIterator.remove()
-//            }
-//        }
-//    }
 
     @ReactMethod
     fun onRequest(url: String, root: String, query: String, promise: Promise) {
@@ -50,7 +41,6 @@ class NetworkModule(reactContext: ReactApplicationContext) :
                     val responseBody = requireNotNull(response.body) //무슨 문제인지
                     val responseText = responseBody.string()
                     val contentType = responseBody.contentType().toString()
-//                    println(responseText + "\n" + contentType)
                     if (contentType.indexOf("text") > -1) {
                         val returnValue = WritableNativeArray()
                         val result =
@@ -71,10 +61,7 @@ class NetworkModule(reactContext: ReactApplicationContext) :
                         promise.resolve(returnValue)
                     } else if (contentType.indexOf("json") > -1) {
                         try {
-                            val isJsonObj = JSON.parse(responseText) is JSONObject
-                            if(!isJsonObj){
-                                promise.resolve(convertJsonToMap(JSONObject(responseText)))
-                            }
+                            promise.resolve(convertJsonToMap(JSONObject(responseText)))
                         } catch (e: Exception) {
                             e.printStackTrace()
                             promise.reject("test", Throwable(e))
@@ -82,15 +69,13 @@ class NetworkModule(reactContext: ReactApplicationContext) :
                     }
                 }
 
+            } else {
+                Toast.makeText(reactContext, "키워드를 입력하여 주세요", Toast.LENGTH_SHORT).show()
             }
 
         } catch (e: Exception) {
-//            println("test: " + url + root + "query=" + query + "&size=1&page=1&target=title")
-//            Toast.makeText(this, "테스트", Toast.LENGTH_LONG)
             e.printStackTrace()
             promise.reject(e)
         }
     }
-
-
 }

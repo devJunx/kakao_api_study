@@ -13,16 +13,14 @@ class WebViewModule(private val reactContext: ReactApplicationContext) : ReactCo
         return "WebViewModule"
     }
 
+    /* webView */
     @ReactMethod
-    fun onCreateWebView(url: String, isWebView: Boolean, promise: Promise) {
-
+    fun onCreateWebView(url: String, promise: Promise) {
         try{
             val intent = Intent(reactContext, WebActivity::class.java)
-            if(isWebView){
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 intent.putExtra("url", url)
                 reactContext.startActivity(intent)
-            }
         } catch (e: Exception){
             e.printStackTrace()
             promise.reject(e)

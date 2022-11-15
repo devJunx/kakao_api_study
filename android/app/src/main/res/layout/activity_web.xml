@@ -24,12 +24,12 @@
             android:background="@drawable/not_border"
             android:ems="10"
             android:hint="@string/url"
+            android:imeOptions="actionDone"
             android:inputType="textUri"
             android:padding="5dp"
-            android:textSize="20sp"
             android:selectAllOnFocus="true"
-            android:imeOptions="actionDone"
-            tools:ignore="TouchTargetSizeCheck"/>
+            android:textSize="20sp"
+            tools:ignore="TouchTargetSizeCheck" />
 
         <ImageView
             android:id="@+id/search_button"
@@ -37,12 +37,12 @@
             android:layout_height="50dp"
             android:layout_gravity="end"
             android:contentDescription="@string/close_button_description"
-            android:padding="5dp"
+            android:padding="10dp"
             android:src="@drawable/ic_baseline_search_24"
             tools:ignore="ImageContrastCheck" />
 
         <ImageView
-            android:id="@+id/copy_this_url"
+            android:id="@+id/copy_button"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -50,14 +50,25 @@
             app:srcCompat="@drawable/ic_baseline_content_copy_24" />
 
         <ImageView
+            android:id="@+id/share_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="end"
+            android:contentDescription="@string/close_button_description"
+            android:padding="10dp"
+            android:src="@drawable/ic_baseline_share_24"
+            tools:ignore="ImageContrastCheck" />
+
+        <ImageView
             android:id="@+id/close_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_gravity="end"
             android:contentDescription="@string/close_button_description"
-            android:padding="5dp"
+            android:padding="10dp"
             android:src="@drawable/ic_baseline_close_24"
             tools:ignore="ImageContrastCheck" />
+
     </LinearLayout>
 
     <WebView

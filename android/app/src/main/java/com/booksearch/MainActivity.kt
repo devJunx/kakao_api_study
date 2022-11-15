@@ -1,6 +1,7 @@
 package com.booksearch
 
 import android.os.Bundle
+import android.os.PersistableBundle
 import com.facebook.react.ReactActivity
 
 
@@ -10,12 +11,7 @@ class MainActivity : ReactActivity() {
      * rendering of the component.
      */
 
-    override fun onCreate(savedInstanceState: Bundle?){
-        super.onCreate(savedInstanceState)
-
-    }
     override fun getMainComponentName(): String {
         return "bookSearch"
     }
-
 }
