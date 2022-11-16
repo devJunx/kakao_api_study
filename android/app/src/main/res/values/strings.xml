@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">bookSearch</string>
     <string name="close_button_description">책 정보 화면 종료 버튼</string>
-    <string name="url_copy">URL 복사</string>
-    <string name="url">https://example.com</string>
+    <string name="url">insert search lang or url</string>
 </resources>

@@ -51,24 +51,47 @@ class WebActivity : ReactActivity() {
         wbBinding.copyButton.setOnClickListener {
             onCopy(webView.url.toString())
         }
-    }
 
-    /* webView load new url */
-    private fun onSearch(urlInputText: String){
-        with(urlInputText) {
-            when {
-                contains(".com") || contains(".co.kr") || contains(".go.kr") ||
-                contains(".net") || contains(".org") || contains(".dev") -> onWebViewApply(urlInputText)
-                else -> Toast.makeText(this@WebActivity, "url 형식이 틀렸거나 미지원 도메인이 포함되었습니다", android.widget.Toast.LENGTH_SHORT).show()
+        /* webView go forward */
+        wbBinding.forwardButton.setOnClickListener {
+            if (webView.canGoForward()) {
+                webView.goForward()
+                wbBinding.urlInput.setText(webView.originalUrl)
             }
+        }
+
+        /* webView go back*/
+        wbBinding.backButton.setOnClickListener {
+            if (webView.canGoBack()) {
+                webView.goBack()
+                wbBinding.urlInput.setText(webView.originalUrl)
+            }
+        }
+
+
+        /* webView reload */
+        wbBinding.refreshButton.setOnClickListener {
+            wbBinding.webView.reload()
         }
     }
 
+    /* webView load new url */
+    private fun onSearch(urlInputText: String) {
+        onWebViewApply(urlInputText)
+//        with(urlInputText) {
+//            when {
+//                contains(".com") || contains(".co.kr") || contains(".go.kr") ||
+//                contains(".net") || contains(".org") || contains(".dev") || contains(".wiki") -> onWebViewApply(urlInputText)
+//                else -> Toast.makeText(this@WebActivity, "url 형식이 틀렸거나 미지원 도메인이 포함되었습니다", android.widget.Toast.LENGTH_SHORT).show()
+//            }
+//        }
+    }
+
     /* current webView url doing copy */
-    private fun onCopy(copyText: String){
+    private fun onCopy(copyText: String) {
         val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip: ClipData = ClipData.newPlainText("copyText", copyText)
-        if(clipboardManager.primaryClip.toString().contains(copyText)){
+        if (clipboardManager.primaryClip.toString().contains(copyText)) {
             Toast.makeText(this@WebActivity, "이미 클립보드에 복사되었습니다.", Toast.LENGTH_SHORT).show()
         } else {
             clipboardManager.setPrimaryClip(clip)
@@ -77,7 +100,7 @@ class WebActivity : ReactActivity() {
     }
 
     /* share the current webView url */
-    private fun onShare(shareText: String){
+    private fun onShare(shareText: String) {
         val intent = Intent()
         intent.action = Intent.ACTION_SEND
         intent.type = "text/plain"
@@ -92,7 +115,7 @@ class WebActivity : ReactActivity() {
         wbBinding.webView.apply {
             @SuppressLint("SetJavaScriptEnabled")
             settings.javaScriptEnabled = true
-            settings.useWideViewPort = true
+            settings.loadWithOverviewMode = true
             loadUrl(url)
         }
     }

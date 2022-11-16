@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, StyleSheet, Text, TextInput, View, ToastAndroid, TouchableWithoutFeedback, Alert, Linking, Image, Dimensions, ScrollView } from 'react-native';
+import { FlatList, StyleSheet, Text, TextInput, View, ToastAndroid, TouchableWithoutFeedback, Alert, Linking, Image, Dimensions, ScrollView, PixelRatio } from 'react-native';
 import NetworkModule from './module/NetworkModule';
 import WebviewModule from './module/WebviewModule';
 
@@ -43,7 +43,6 @@ export const KakaoNetwork: IKakaoNetwork = {
             NetworkModule.onRequest<T>(url, root, query)
                 .then(resolve)
                 .catch(error => {
-                    console.log(error)
                     reject(error)
                 })
         })
@@ -51,13 +50,12 @@ export const KakaoNetwork: IKakaoNetwork = {
     },
 }
 
-
 const OnWebView: WebView = {
     view<T = string>(url: string, isWebView: boolean): Promise<T> {
         return new Promise((resolve, reject) => {
             if (isWebView) {
                 WebviewModule.onCreateWebView<T>(url)
-                    .then(resolve => {console.log(resolve)})
+                    .then(resolve)
                     .catch(error => {
                         console.log(error)
                         reject(error)
@@ -75,26 +73,29 @@ const onCreateWeb = (viewUrl: string) => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#f7dfb0',
+        backgroundColor: '#F4F4F4',
         width: '100%',
         height: '100%'
     },
     item: {
-        backgroundColor: '#FCB837',
+        backgroundColor: '#FFFFFF',
         padding: 15,
-        marginVertical: 8,
+        marginHorizontal: 15,
         borderRadius: 5,
         flexDirection: 'row',
+        alignItems: 'center'
     },
     title: {
         fontSize: 13,
     },
-    input: {
-        borderWidth: 1,
-        borderRadius: 5,
-        borderColor: '#FCB837',
-        paddingLeft: 10,
-        margin: 16
+    search: {
+        borderRadius: 3,
+        backgroundColor: '#EBEBEB',
+        margin: 15,
+        paddingHorizontal: 15,
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        alignItems: 'center'
     },
     infoView: {
         flexDirection: 'row',
@@ -109,19 +110,20 @@ const Item = ({ id, title, author, sale_price, thumbnail, publisher }) => {
     const titleStyle = [styles.title, { color: '#808080', width: 60 }]
     const infoViewStyle = styles.infoView
     const isThumbnail = thumbnail != "" ? thumbnail : 'https://search1.kakaocdn.net/thumb/C216x312.q85/?fname=https://i1.daumcdn.net/imgsrc.search/search_all/noimage_grid4.png'
+    const isSubString = (start: any, end: any) => { return publisher.substring(start, end) }
+    const isPublisher = publisher.includes('(') ? isSubString(0, publisher.indexOf('(')) : (publisher.includes(' ') ? isSubString(0, publisher.indexOf(' ')) : publisher)
     return (
-        // <TouchableWithoutFeedback onPress={isShowURL}>
-        <ScrollView style={styles.item} horizontal={true} onTouchStart={() => onCreateWeb(state.data[id].url)}>
-            <Image style={{ width: (Dimensions.get('screen').width / 2.5), height: '100%', marginRight: 15, backgroundColor: 'white' }} source={{ uri: isThumbnail }} />
+        <View style={styles.item} onTouchEnd={() => onCreateWeb(state.data[id].url)}>
+            <Image style={{ width: 100, height: 100, marginRight: 15, backgroundColor: 'white', borderRadius: 30, borderWidth: 1 }} source={{ uri: isThumbnail }} />
             <View style={{ width: (Dimensions.get('screen').width - 50) / 2, justifyContent: 'center' }}>
-                <Text style={{ fontSize: 15, fontWeight: 'bold' }}>{title}</Text>
+                <Text style={{ fontSize: 15 }}>{title}</Text>
                 <View style={infoViewStyle}>
                     <Text style={titleStyle}>저자</Text>
                     <Text style={[styles.title, { color: 'blue' }]}>{author}</Text>
                 </View>
                 <View style={infoViewStyle}>
                     <Text style={titleStyle}>출판</Text>
-                    <Text style={[styles.title, { color: 'blue' }]}>{publisher}</Text>
+                    <Text style={[styles.title, { color: 'blue' }]}>{isPublisher}</Text>
                 </View>
                 <View style={infoViewStyle}>
                     <Text style={titleStyle}>판매가</Text>
@@ -129,8 +131,7 @@ const Item = ({ id, title, author, sale_price, thumbnail, publisher }) => {
                     <Text style={[styles.title, { color: 'red' }]}>{sale_price}</Text>
                 </View>
             </View>
-        </ScrollView>
-        // </TouchableWithoutFeedback>
+        </View>
     )
 };
 
@@ -146,19 +147,16 @@ const state = {
     }],
     item: 1
 }
-const bookSearch = async (query: string, isScroll?: boolean) => {
+const bookSearch = async (query: string) => {
     const saleRegex = /\B(?=(\d{3})+(?!\d))/g
-    // let url =
-    // 'https://dapi.kakao.com/v3/search/book?query=' + query + '&size=1&page=1&target=title';
-    // console.log('test: ', encodeURI(url)))
     const putData = (res: any) => {
         for (let i = 0; i < 5; i++) {
             const sale_price = res.documents[i].sale_price.toString().replace(saleRegex, ",") + '원'
-            const authors = res.documents[i].authors[0].split(' ')
+            const authors = res.documents[i].authors[0]
             state.data.push({
                 id: state.data.length.toString(),
                 title: res.documents[i].title.toString(),
-                authors: authors[0],
+                authors: authors,
                 url: res.documents[i].url,
                 sale_price: res.documents[i].sale_price < 0 ? '품절' : sale_price,
                 thumbnail: res.documents[i].thumbnail,
@@ -169,11 +167,7 @@ const bookSearch = async (query: string, isScroll?: boolean) => {
     return KakaoNetwork.get('https://dapi.kakao.com', '/v3/search/book?', encodeURI(query))
         .then((res: any) => {
             if (res.meta.pageable_count != 0) {
-                if (isScroll == true) {
-                    putData(res)
-                } else {
-                    putData(res)
-                }
+                putData(res)
             } else {
                 ToastAndroid.show("검색하신 키워드의 책이 안 보입니다.", ToastAndroid.SHORT)
             }
@@ -182,25 +176,27 @@ const bookSearch = async (query: string, isScroll?: boolean) => {
 };
 
 const DataList = () => {
-    const renderItem = ({ item }) => (
-        <Item id={item.id} title={item.title} author={item.authors.length > 0 ? item.authors : "작가를 모르겠습니다."} sale_price={item.sale_price} thumbnail={item.thumbnail} publisher={item.publisher} />
-    );
+    const renderItem = ({ item }) => {
+        return <Item id={item.id} title={item.title} author={item.authors.length > 0 ? item.authors : "작가를 모르겠습니다."} sale_price={item.sale_price} thumbnail={item.thumbnail} publisher={item.publisher} />
+    };
     const [input, setInput] = React.useState('')
-    
+
     return (
         <View style={styles.container}>
-            <TextInput style={styles.input} onChangeText={(text: any) => { setInput(text) }} />
-            <View style={{ flexDirection: 'row' }}>
-                <Text style={{ flex: 1, backgroundColor: '#e89e0e', color: 'white', textAlign: 'center', paddingVertical: 15, borderRadius: 5, marginHorizontal: 16 }} onPress={() => { bookSearch(input) }}>책검색</Text>
-                <Text style={{ flex: 1, backgroundColor: '#e89e0e', color: 'white', textAlign: 'center', paddingVertical: 15, borderRadius: 5, marginHorizontal: 16 }} onPress={() => { state.data.splice(1, state.data.length) }}>검색 목록 삭제</Text>
+            <View style={styles.search}>
+                <TextInput style={{ width: 320, height: 45, textAlignVertical: 'center' }} onChangeText={(text: any) => { setInput(text) }} value={input} />
+                <TouchableWithoutFeedback onPress={() => bookSearch(input)}>
+                    <Image style={{ width: 20, height: 20 }} source={{ uri: 'https://iconmonstr.com/wp-content/g/gd/makefg.php?i=../releases/preview/7.7.0/png/iconmonstr-magnifier-lined.png&r=0&g=0&b=0' }} />
+                </TouchableWithoutFeedback>
             </View>
-            {/* <Button title='책 검색' onPress={() => { bookSearch(input) }}/> */}
-            <Text style={{ textAlign: 'center', fontSize: 15, marginTop: 10 }}>작가가 2명 이상시 1명만 표시</Text>
-            <FlatList
-                data={state.data}
-                onEndReachedThreshold={1}
-                onScrollEndDrag={() => { bookSearch(input, true) }}
-                renderItem={renderItem} />
+            {input != '' &&
+                <FlatList
+                    style={{ borderRadius: 5 }}
+                    data={state.data}
+                    onEndReachedThreshold={1}
+                    onScrollEndDrag={() => { bookSearch(input) }}
+                    renderItem={renderItem} />
+            }
         </View>
     )
 }
