@@ -102,16 +102,15 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     }
 })
-
-
-const bookSearch = async (query: string) => {
+const KAKAO_BASE_URL = 'https://dapi.kakao.com'
+const BookSearch = async (query: string) => {
     const saleRegex = /\B(?=(\d{3})+(?!\d))/g
     const putData = (res: any) => {
         for (let i = 0; i < 5; i++) {
             const sale_price = res.documents[i].sale_price.toString().replace(saleRegex, ",") + '원'
             const authors = res.documents[i].authors.length > 0 ? res.documents[i].authors[0] : '작가 없음'
-            state.data.push({
-                id: state.data.length.toString(),
+            State.BookData.push({
+                id: State.BookData.length.toString(),
                 title: res.documents[i].title.toString(),
                 authors: authors,
                 url: res.documents[i].url,
@@ -121,7 +120,7 @@ const bookSearch = async (query: string) => {
             })
         }
     }
-    return KakaoNetwork.get('https://dapi.kakao.com', '/v3/search/book?', encodeURI(query))
+    return KakaoNetwork.get(KAKAO_BASE_URL, '/v3/search/book?', encodeURI(query))
         .then((res: any) => {
             if (res.meta.pageable_count != 0) {
                 putData(res)
@@ -139,7 +138,7 @@ const Item = ({ id, title, author, sale_price, thumbnail, publisher }) => {
     const isSubString = (start: any, end: any) => { return publisher.substring(start, end) }
     const isPublisher = publisher.includes('(') ? isSubString(0, publisher.indexOf('(')) : (publisher.includes(' ') ? isSubString(0, publisher.indexOf(' ')) : publisher)
     return (
-        <TouchableWithoutFeedback onPress={() => Alert.alert("책 보기", title + "의 정보를 보려고 하는것이 맞나요?", [{ text: "취소" }, { text: "확인", onPress: () => onCreateWeb(state.data[id].url) }])} onLongPress={() => Alert.alert("삭제", "삭제하시겠습니까?", [{ text: "예", onPress: () => state.data.splice(parseInt(id), 1) }, { text: "아니오" }])}>
+        <TouchableWithoutFeedback onPress={() => Alert.alert("책 보기", title + "의 정보를 볼건가요?", [{ text: "취소" }, { text: "확인", onPress: () => onCreateWeb(State.BookData[id].url) }])} onLongPress={() => Alert.alert("삭제", "삭제하시겠습니까?", [{ text: "예", onPress: () => State.BookData.splice(parseInt(id), 1) }, { text: "아니오" }])}>
             <View style={styles.item}>
                 <Image style={{ width: 100, height: 100, marginRight: 15, backgroundColor: 'white', borderRadius: 30, borderWidth: 1 }} source={{ uri: isThumbnail }} />
                 <View style={{ width: (Dimensions.get('screen').width - 50) / 2, justifyContent: 'center' }}>
@@ -164,8 +163,8 @@ const Item = ({ id, title, author, sale_price, thumbnail, publisher }) => {
         </TouchableWithoutFeedback>
     )
 };
-const state = {
-    data: [{
+const State = {
+    BookData: [{
         id: '0',
         title: '책',
         authors: '김영준',
@@ -186,16 +185,16 @@ const DataList = () => {
         <View style={styles.container}>
             <View style={styles.search}>
                 <TextInput style={{ width: 320, height: 45, textAlignVertical: 'center' }} onChangeText={(text: any) => { setInput(text) }} value={input} />
-                <TouchableWithoutFeedback onPress={() => bookSearch(input)} onLongPress={() => setInput('')}>
+                <TouchableWithoutFeedback onPress={() => BookSearch(input)} onLongPress={() => setInput('')}>
                     <Image style={{ width: 20, height: 20 }} source={{ uri: 'https://iconmonstr.com/wp-content/g/gd/makefg.php?i=../releases/preview/7.7.0/png/iconmonstr-magnifier-lined.png&r=0&g=0&b=0' }} />
                 </TouchableWithoutFeedback>
             </View>
             {input != '' &&
                 <FlatList
                     style={{ borderRadius: 5 }}
-                    data={state.data}
+                    data={State.BookData}
                     onEndReachedThreshold={1}
-                    onScrollEndDrag={() => { bookSearch(input) }}
+                    onScrollEndDrag={() => { BookSearch(input) }}
                     renderItem={renderItem} />
             }
         </View>
