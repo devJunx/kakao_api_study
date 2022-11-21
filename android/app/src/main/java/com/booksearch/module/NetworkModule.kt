@@ -24,7 +24,6 @@ class NetworkModule(private val reactContext: ReactApplicationContext) :
 
     @ReactMethod
     fun onRequest(url: String, root: String, query: String, promise: Promise) {
-
         fun isNetworkConnected(context: Context) {
             val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             val capabilities = cm.getNetworkCapabilities(cm.activeNetwork)

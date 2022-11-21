@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, StyleSheet, Text, TextInput, View, ToastAndroid, TouchableWithoutFeedback, Alert, Linking, Image, Dimensions, ScrollView, PixelRatio } from 'react-native';
+import { FlatList, StyleSheet, Text, TextInput, View, ToastAndroid, TouchableWithoutFeedback, Image, Dimensions, Alert } from 'react-native';
 import NetworkModule from './module/NetworkModule';
 import WebviewModule from './module/WebviewModule';
 
@@ -57,7 +57,6 @@ const OnWebView: WebView = {
                 WebviewModule.onCreateWebView<T>(url)
                     .then(resolve)
                     .catch(error => {
-                        console.log(error)
                         reject(error)
                     })
             }
@@ -99,60 +98,18 @@ const styles = StyleSheet.create({
     },
     infoView: {
         flexDirection: 'row',
-        marginTop: 5
+        marginTop: 5,
+        alignItems: 'center'
     }
 })
 
 
-
-const Item = ({ id, title, author, sale_price, thumbnail, publisher }) => {
-    // const isShowURL = () => { Alert.alert("이 책 보기", "이 책 관련해서 정보를 알려드릴까요", [{ text: "예", onPress: () => Alert.alert("정보 보기 유형", "", [{ text: "웹 브라우저", onPress: () => Linking.openURL(state.data[id].url) }, { text: "앱에서", onPress: () => onCreateWeb(state.data[id].url) }]) }, { text: "아니오" }]) }
-    const titleStyle = [styles.title, { color: '#808080', width: 60 }]
-    const infoViewStyle = styles.infoView
-    const isThumbnail = thumbnail != "" ? thumbnail : 'https://search1.kakaocdn.net/thumb/C216x312.q85/?fname=https://i1.daumcdn.net/imgsrc.search/search_all/noimage_grid4.png'
-    const isSubString = (start: any, end: any) => { return publisher.substring(start, end) }
-    const isPublisher = publisher.includes('(') ? isSubString(0, publisher.indexOf('(')) : (publisher.includes(' ') ? isSubString(0, publisher.indexOf(' ')) : publisher)
-    return (
-        <View style={styles.item} onTouchEnd={() => onCreateWeb(state.data[id].url)}>
-            <Image style={{ width: 100, height: 100, marginRight: 15, backgroundColor: 'white', borderRadius: 30, borderWidth: 1 }} source={{ uri: isThumbnail }} />
-            <View style={{ width: (Dimensions.get('screen').width - 50) / 2, justifyContent: 'center' }}>
-                <Text style={{ fontSize: 15 }}>{title}</Text>
-                <View style={infoViewStyle}>
-                    <Text style={titleStyle}>저자</Text>
-                    <Text style={[styles.title, { color: 'blue' }]}>{author}</Text>
-                </View>
-                <View style={infoViewStyle}>
-                    <Text style={titleStyle}>출판</Text>
-                    <Text style={[styles.title, { color: 'blue' }]}>{isPublisher}</Text>
-                </View>
-                <View style={infoViewStyle}>
-                    <Text style={titleStyle}>판매가</Text>
-                    <Text style={{ marginRight: 8, borderWidth: 1, borderColor: 'lightgray', backgroundColor: 'white', textAlign: 'center', paddingHorizontal: 3 }}>서적</Text>
-                    <Text style={[styles.title, { color: 'red' }]}>{sale_price}</Text>
-                </View>
-            </View>
-        </View>
-    )
-};
-
-const state = {
-    data: [{
-        id: '0',
-        title: '책이름',
-        authors: '김영준',
-        url: 'https://namu.wiki/w/%EC%B1%85',
-        sale_price: '0원',
-        thumbnail: 'https://w.namu.la/s/5aed1de3e76dd5a0fa9185a3523182ecd66873d77fb7261c9cea9398eac1af1423a74a3557dd4679fffa6ca0e16c604c576489cd3b37b9db5a6adcaa65341cb07cfa72a94e4637824a01de269d81ab1ed198a8366740d2b8bf0881296ffdd7ae706491bce78fc16f34b364e8682fc4e6',
-        publisher: '어떤컴퍼니'
-    }],
-    item: 1
-}
 const bookSearch = async (query: string) => {
     const saleRegex = /\B(?=(\d{3})+(?!\d))/g
     const putData = (res: any) => {
         for (let i = 0; i < 5; i++) {
             const sale_price = res.documents[i].sale_price.toString().replace(saleRegex, ",") + '원'
-            const authors = res.documents[i].authors[0]
+            const authors = res.documents[i].authors.length > 0 ? res.documents[i].authors[0] : '작가 없음'
             state.data.push({
                 id: state.data.length.toString(),
                 title: res.documents[i].title.toString(),
@@ -174,10 +131,54 @@ const bookSearch = async (query: string) => {
         })
         .catch((error: string) => console.log(error))
 };
-
+const Item = ({ id, title, author, sale_price, thumbnail, publisher }) => {
+    // const isShowURL = () => { Alert.alert("이 책 보기", "이 책 관련해서 정보를 알려드릴까요", [{ text: "예", onPress: () => Alert.alert("정보 보기 유형", "", [{ text: "웹 브라우저", onPress: () => Linking.openURL(state.data[id].url) }, { text: "앱에서", onPress: () => onCreateWeb(state.data[id].url) }]) }, { text: "아니오" }]) }
+    const titleStyle = [styles.title, { color: '#808080', width: 60 }]
+    const infoViewStyle = styles.infoView
+    const isThumbnail = thumbnail != "" ? thumbnail : 'https://search1.kakaocdn.net/thumb/C216x312.q85/?fname=https://i1.daumcdn.net/imgsrc.search/search_all/noimage_grid4.png'
+    const isSubString = (start: any, end: any) => { return publisher.substring(start, end) }
+    const isPublisher = publisher.includes('(') ? isSubString(0, publisher.indexOf('(')) : (publisher.includes(' ') ? isSubString(0, publisher.indexOf(' ')) : publisher)
+    return (
+        <TouchableWithoutFeedback onPress={() => Alert.alert("책 보기", title + "의 정보를 보려고 하는것이 맞나요?", [{ text: "취소" }, { text: "확인", onPress: () => onCreateWeb(state.data[id].url) }])} onLongPress={() => Alert.alert("삭제", "삭제하시겠습니까?", [{ text: "예", onPress: () => state.data.splice(parseInt(id), 1) }, { text: "아니오" }])}>
+            <View style={styles.item}>
+                <Image style={{ width: 100, height: 100, marginRight: 15, backgroundColor: 'white', borderRadius: 30, borderWidth: 1 }} source={{ uri: isThumbnail }} />
+                <View style={{ width: (Dimensions.get('screen').width - 50) / 2, justifyContent: 'center' }}>
+                    <View style={infoViewStyle}>
+                        <Text style={{ fontSize: 15 }}>{title}</Text>
+                    </View>
+                    <View style={infoViewStyle}>
+                        <Text style={titleStyle}>저자</Text>
+                        <Text style={[styles.title, { color: 'blue' }]}>{author}</Text>
+                    </View>
+                    <View style={infoViewStyle}>
+                        <Text style={titleStyle}>출판</Text>
+                        <Text style={[styles.title, { color: 'blue' }]}>{isPublisher}</Text>
+                    </View>
+                    <View style={infoViewStyle}>
+                        <Text style={titleStyle}>판매가</Text>
+                        <Text style={{ marginRight: 8, borderWidth: 1, borderColor: 'lightgray', backgroundColor: 'white', textAlign: 'center', paddingHorizontal: 3, color: 'black' }}>서적</Text>
+                        <Text style={[styles.title, { color: 'red' }]}>{sale_price}</Text>
+                    </View>
+                </View>
+            </View>
+        </TouchableWithoutFeedback>
+    )
+};
+const state = {
+    data: [{
+        id: '0',
+        title: '책',
+        authors: '김영준',
+        url: 'https://namu.wiki/w/%EC%B1%85',
+        sale_price: '0원',
+        thumbnail: 'https://w.namu.la/s/5aed1de3e76dd5a0fa9185a3523182ecd66873d77fb7261c9cea9398eac1af1423a74a3557dd4679fffa6ca0e16c604c576489cd3b37b9db5a6adcaa65341cb07cfa72a94e4637824a01de269d81ab1ed198a8366740d2b8bf0881296ffdd7ae706491bce78fc16f34b364e8682fc4e6',
+        publisher: '어떤컴퍼니'
+    }],
+    item: 1
+}
 const DataList = () => {
     const renderItem = ({ item }) => {
-        return <Item id={item.id} title={item.title} author={item.authors.length > 0 ? item.authors : "작가를 모르겠습니다."} sale_price={item.sale_price} thumbnail={item.thumbnail} publisher={item.publisher} />
+        return <Item id={item.id} title={item.title} author={item.authors != '' ? item.authors : '작가 없음'} sale_price={item.sale_price} thumbnail={item.thumbnail} publisher={item.publisher} />
     };
     const [input, setInput] = React.useState('')
 
@@ -185,7 +186,7 @@ const DataList = () => {
         <View style={styles.container}>
             <View style={styles.search}>
                 <TextInput style={{ width: 320, height: 45, textAlignVertical: 'center' }} onChangeText={(text: any) => { setInput(text) }} value={input} />
-                <TouchableWithoutFeedback onPress={() => bookSearch(input)}>
+                <TouchableWithoutFeedback onPress={() => bookSearch(input)} onLongPress={() => setInput('')}>
                     <Image style={{ width: 20, height: 20 }} source={{ uri: 'https://iconmonstr.com/wp-content/g/gd/makefg.php?i=../releases/preview/7.7.0/png/iconmonstr-magnifier-lined.png&r=0&g=0&b=0' }} />
                 </TouchableWithoutFeedback>
             </View>
