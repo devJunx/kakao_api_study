@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     }
 })
-const KAKAO_BASE_URL = 'https://dapi.kakao.com'
+
 const BookSearch = async (query: string) => {
     const saleRegex = /\B(?=(\d{3})+(?!\d))/g
     const putData = (res: any) => {
@@ -120,7 +120,7 @@ const BookSearch = async (query: string) => {
             })
         }
     }
-    return KakaoNetwork.get(KAKAO_BASE_URL, '/v3/search/book?', encodeURI(query))
+    return KakaoNetwork.get(State.KAKAO_BASE_URL, '/v3/search/book?', encodeURI(query))
         .then((res: any) => {
             if (res.meta.pageable_count != 0) {
                 putData(res)
@@ -138,7 +138,9 @@ const Item = ({ id, title, author, sale_price, thumbnail, publisher }) => {
     const isSubString = (start: any, end: any) => { return publisher.substring(start, end) }
     const isPublisher = publisher.includes('(') ? isSubString(0, publisher.indexOf('(')) : (publisher.includes(' ') ? isSubString(0, publisher.indexOf(' ')) : publisher)
     return (
-        <TouchableWithoutFeedback onPress={() => Alert.alert("책 보기", title + "의 정보를 볼건가요?", [{ text: "취소" }, { text: "확인", onPress: () => onCreateWeb(State.BookData[id].url) }])} onLongPress={() => Alert.alert("삭제", "삭제하시겠습니까?", [{ text: "예", onPress: () => State.BookData.splice(parseInt(id), 1) }, { text: "아니오" }])}>
+        <TouchableWithoutFeedback onPress={() => Alert.alert("책 보기", title + "의 정보를 볼건가요?", [{ text: "취소" }, { text: "확인", onPress: () => onCreateWeb(State.BookData[id].url) }])} 
+        onLongPress={() => Alert.alert("삭제", "삭제하시겠습니까?", [{ text: "예", onPress: () => State.BookData.splice(parseInt(id), 1) }, { text: "아니오" }])}
+        >
             <View style={styles.item}>
                 <Image style={{ width: 100, height: 100, marginRight: 15, backgroundColor: 'white', borderRadius: 30, borderWidth: 1 }} source={{ uri: isThumbnail }} />
                 <View style={{ width: (Dimensions.get('screen').width - 50) / 2, justifyContent: 'center' }}>
@@ -173,7 +175,7 @@ const State = {
         thumbnail: 'https://w.namu.la/s/5aed1de3e76dd5a0fa9185a3523182ecd66873d77fb7261c9cea9398eac1af1423a74a3557dd4679fffa6ca0e16c604c576489cd3b37b9db5a6adcaa65341cb07cfa72a94e4637824a01de269d81ab1ed198a8366740d2b8bf0881296ffdd7ae706491bce78fc16f34b364e8682fc4e6',
         publisher: '어떤컴퍼니'
     }],
-    item: 1
+    KAKAO_BASE_URL: 'https://dapi.kakao.com'
 }
 const DataList = () => {
     const renderItem = ({ item }) => {
