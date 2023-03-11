@@ -6,7 +6,6 @@ export default NativeModules.NetworkModule as {
         root: string,
         query: string
     ): Promise<T>,
-    test(): Promise<void>
 }
 
 
